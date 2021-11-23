@@ -24,10 +24,12 @@ public class PaintView extends View {
     private Path path = new Path();
     private Paint brush = new Paint();
 
+    float width = 1920;
+    float height = 1080;
     public PaintView(Context context) {
         super(context);
 
-        layoutParams = new ViewGroup.LayoutParams(1920, 1080);
+        layoutParams = new ViewGroup.LayoutParams((int) width, (int) height);
     }
 
     public PaintView(Context context, AttributeSet attrs) {
@@ -39,6 +41,7 @@ public class PaintView extends View {
     }
 
     float length = 0;
+    int animationStep = 0;
     public void startDrawing(ArrayList<PathModel> listPath) {
         brush.setAntiAlias(true);
         brush.setStyle(Paint.Style.STROKE);
@@ -68,7 +71,7 @@ public class PaintView extends View {
         animator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
-
+                animationStep++;
             }
 
             @Override
@@ -93,14 +96,14 @@ public class PaintView extends View {
         Log.d("qqDebug","setPhase called with:" + phase);
     }
 
-    private static PathEffect createPathEffect(float pathLength, float phase, float offset)
-    {
+    private static PathEffect createPathEffect(float pathLength, float phase, float offset) {
         return new DashPathEffect(new float[] { pathLength, pathLength },
                 Math.max(phase * pathLength, offset));
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
+        canvas.scale(1f, -1f, width, height/3);
         super.onDraw(canvas);
         canvas.drawPath(path, brush);
     }
