@@ -103,7 +103,8 @@ public class PaintView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.scale(1f, -1f, width, height/3);
+        canvas.translate(0,getHeight());
+        canvas.scale(1f, -1f);
         super.onDraw(canvas);
         canvas.drawPath(path, brush);
     }
