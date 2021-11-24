@@ -12,6 +12,10 @@ import java.io.InputStream
 import java.nio.charset.Charset
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
+import android.util.DisplayMetrics
+
+
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -47,13 +51,36 @@ class MainActivity : AppCompatActivity() {
 
         val paintView = findViewById<PaintView>(R.id.paintView)
         paintView.initBrush()
-        paintView.drawSample(listPathSample)
+
+        val paintView1 = findViewById<PaintView>(R.id.paintView1)
+        paintView1.initBrush()
+
+        val paintView2 = findViewById<PaintView>(R.id.paintView2)
+        paintView2.initBrush()
         
         val button = findViewById<Button>(R.id.button)
         button.setOnClickListener {
             paintView.drawAnimation(listPathDraw)
+            paintView1.drawAnimation(listPathDraw)
+            paintView2.drawAnimation(listPathDraw)
         }
+
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        val height = displayMetrics.heightPixels
+        val width = displayMetrics.widthPixels
+
+        paintView.setScreenMeasure(width, height)
+        paintView.drawSample(listPathSample)
+
+        paintView1.setScreenMeasure(width, height)
+        paintView1.drawSample(listPathSample)
+
+        paintView2.setScreenMeasure(width, height)
+        paintView2.drawSample(listPathSample)
     }
+
+
 
     private fun loadJSONFromAsset(assetName: String): String {
         var json: String = ""

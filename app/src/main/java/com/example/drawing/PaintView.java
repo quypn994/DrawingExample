@@ -12,6 +12,7 @@ import android.graphics.Path;
 import android.graphics.PathEffect;
 import android.graphics.PathMeasure;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,22 +21,21 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 public class PaintView extends View {
-    public ViewGroup.LayoutParams layoutParams;
-
-    float width = 1920;
-    float height = 1080;
+    int width, height;
+    Context context;
     public PaintView(Context context) {
         super(context);
-
-        layoutParams = new ViewGroup.LayoutParams((int) width, (int) height);
+        this.context = context;
     }
 
     public PaintView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        this.context = context;
     }
 
     public PaintView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        this.context = context;
     }
 
     private Paint brushSample = new Paint();
@@ -46,6 +46,9 @@ public class PaintView extends View {
     private Path pathStroke = new Path();
     private ArrayList<Path> pathDraw = new ArrayList<>();
     public void initBrush() {
+        width = getMeasuredWidth();
+        height = getMeasuredHeight();
+
         brushSample.setAntiAlias(true);
         brushSample.setStyle(Paint.Style.STROKE);
         brushSample.setStrokeJoin(Paint.Join.ROUND);
@@ -62,6 +65,8 @@ public class PaintView extends View {
 
         pathSample.setFillType(Path.FillType.EVEN_ODD);
         pathStroke.setFillType(Path.FillType.EVEN_ODD);
+
+        Log.d("qqDebug", "w: " + width + ", h: " + height);
     }
 
 
@@ -161,10 +166,35 @@ public class PaintView extends View {
                 Math.max(phase * pathLength, offset));
     }
 
+    float scaleRatio = 1;
+    int screenW = 0, screenH = 0;
+    float offsetRatio;
+    public void setScreenMeasure(int screenW, int screenH) {
+        this.screenW = screenW;
+        this.screenH = screenH;
+    }
+
+    public void initRatio(int viewW, int viewH) {
+        if (screenW > screenH) {
+            scaleRatio = (float) viewW / screenW * 3f;
+            offsetRatio = (float) viewW / screenW * 100f;
+        } else {
+            scaleRatio = (float) viewH / screenH * 3f;
+            offsetRatio = (float) viewH / screenH * 100f;
+        }
+        Log.d("qqDebug", "sW: " + screenW + ", sH: " + screenH);
+        Log.d("qqDebug", "vW: " + viewW + ", vH: " + viewH);
+        Log.d("qqDebug", "scaleRatio: " + scaleRatio);
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         canvas.translate(0,getHeight());
         canvas.scale(1f, -1f);
+
+        initRatio(getWidth(), getHeight());
+        canvas.translate(offsetRatio * -10, offsetRatio * -1);
+        canvas.scale(scaleRatio, scaleRatio);
         super.onDraw(canvas);
 
         canvas.drawPath(pathStroke, brushStroke);
