@@ -48,12 +48,10 @@ class MainActivity : AppCompatActivity() {
         val paintView = findViewById<PaintView>(R.id.paintView)
         paintView.initBrush()
         paintView.drawSample(listPathSample)
-
+        
         val button = findViewById<Button>(R.id.button)
         button.setOnClickListener {
-            val paintView1 = findViewById<PaintView>(R.id.paintView1)
-            paintView1.initBrush()
-            paintView1.drawAnimation(listPathDraw)
+            paintView.drawAnimation(listPathDraw)
         }
     }
 
