@@ -21,8 +21,6 @@ import java.util.ArrayList;
 
 public class PaintView extends View {
     public ViewGroup.LayoutParams layoutParams;
-    private Path path = new Path();
-    private Paint brush = new Paint();
 
     float width = 1920;
     float height = 1080;
@@ -40,43 +38,82 @@ public class PaintView extends View {
         super(context, attrs, defStyleAttr);
     }
 
-    float length = 0;
-    int animationStep = 0;
-    public void startDrawing(ArrayList<PathModel> listPath) {
-        brush.setAntiAlias(true);
-        brush.setStyle(Paint.Style.STROKE);
-        brush.setStrokeJoin(Paint.Join.ROUND);
-        brush.setStrokeCap(Paint.Cap.ROUND);
-        brush.setColor(Color.BLACK);
-        brush.setStrokeWidth(3f);
-        path.setFillType(Path.FillType.EVEN_ODD);
+    private Paint brushSample = new Paint();
+    private Paint brushStroke = new Paint();
+    private Paint brushDraw = new Paint();
 
+    private Path pathSample = new Path();
+    private Path pathStroke = new Path();
+    private Path pathDraw = new Path();
+    public void initBrush() {
+        brushSample.setAntiAlias(true);
+        brushSample.setStyle(Paint.Style.STROKE);
+        brushSample.setStrokeJoin(Paint.Join.ROUND);
+        brushSample.setStrokeCap(Paint.Cap.ROUND);
+        brushSample.setColor(Color.CYAN);
+        brushSample.setStrokeWidth(30f);
+
+        brushStroke.setAntiAlias(true);
+        brushStroke.setStyle(Paint.Style.STROKE);
+        brushStroke.setStrokeJoin(Paint.Join.ROUND);
+        brushStroke.setStrokeCap(Paint.Cap.ROUND);
+        brushStroke.setColor(Color.BLACK);
+        brushStroke.setStrokeWidth(45f);
+
+        brushDraw.setAntiAlias(true);
+        brushDraw.setStyle(Paint.Style.STROKE);
+        brushDraw.setStrokeJoin(Paint.Join.ROUND);
+        brushDraw.setStrokeCap(Paint.Cap.ROUND);
+        brushDraw.setColor(Color.YELLOW);
+        brushDraw.setStrokeWidth(30f);
+
+        pathSample.setFillType(Path.FillType.EVEN_ODD);
+        pathStroke.setFillType(Path.FillType.EVEN_ODD);
+        pathDraw.setFillType(Path.FillType.EVEN_ODD);
+    }
+
+
+    boolean isDrawSample = false;
+    public void drawSample(ArrayList<PathModel> listPath) {
         for (int i = 0; i < listPath.size(); i++) {
-            path.moveTo(listPath.get(i).getPath().get(0).getX(), listPath.get(i).getPath().get(0).getY());
+            pathSample.moveTo(listPath.get(i).getPath().get(0).getX(), listPath.get(i).getPath().get(0).getY());
+            pathStroke.moveTo(listPath.get(i).getPath().get(0).getX(), listPath.get(i).getPath().get(0).getY());
             for (int j = 1; j < listPath.get(i).getPath().size(); j++) {
-                path.lineTo(listPath.get(i).getPath().get(j).getX(), listPath.get(i).getPath().get(j).getY());
+                pathSample.lineTo(listPath.get(i).getPath().get(j).getX(), listPath.get(i).getPath().get(j).getY());
+                pathStroke.lineTo(listPath.get(i).getPath().get(j).getX(), listPath.get(i).getPath().get(j).getY());
+            }
+        }
+        isDrawSample = true;
+        invalidate();
+    }
+
+    boolean isDrawAnimation = false;
+    public void drawAnimation(ArrayList<PathModel> listPath) {
+        for (int i = 0; i < listPath.size(); i++) {
+            pathDraw.moveTo(listPath.get(i).getPath().get(0).getX(), listPath.get(i).getPath().get(0).getY());
+            for (int j = 1; j < listPath.get(i).getPath().size(); j++) {
+                pathDraw.lineTo(listPath.get(i).getPath().get(j).getX(), listPath.get(i).getPath().get(j).getY());
             }
         }
 
-        PathMeasure measure = new PathMeasure(path, true);
+        PathMeasure measure = new PathMeasure(pathDraw, true);
         float length = measure.getLength();
-        Log.d("qqDebug", "pathLength: " + length);
 
         ObjectAnimator animator = ObjectAnimator.ofFloat(this, "phase", 1.0f, 0.0f);
         animator.setDuration(5000);
         animator.addUpdateListener(valueAnimator -> {
-            brush.setPathEffect(createPathEffect(length, (Float) valueAnimator.getAnimatedValue(), 0.0f));
+            brushDraw.setPathEffect(createPathEffect(length, (Float) valueAnimator.getAnimatedValue(), 0.0f));
             invalidate();//will calll onDraw
         });
         animator.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
-                animationStep++;
+                isDrawAnimation = true;
             }
 
             @Override
             public void onAnimationEnd(Animator animator) {
-
+                
             }
 
             @Override
@@ -106,6 +143,15 @@ public class PaintView extends View {
         canvas.translate(0,getHeight());
         canvas.scale(1f, -1f);
         super.onDraw(canvas);
-        canvas.drawPath(path, brush);
+
+        if (isDrawSample) {
+            canvas.drawPath(pathStroke, brushStroke);
+            canvas.drawPath(pathSample, brushSample);
+            isDrawSample = false;
+        }
+
+        if (isDrawAnimation) {
+            canvas.drawPath(pathDraw, brushDraw);
+        }
     }
 }

@@ -19,31 +19,48 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val jsonArray = JSONArray(loadJSONFromAsset())
-
-        val listPath : ArrayList<PathModel> = arrayListOf()
-        for (i in 0 until jsonArray.length()) {
-            val jsonObject = jsonArray.getJSONObject(i)
+        val jsonArraySample = JSONArray(loadJSONFromAsset("A_Ve_Mau.json"))
+        val listPathSample : ArrayList<PathModel> = arrayListOf()
+        for (i in 0 until jsonArraySample.length()) {
+            val jsonObject = jsonArraySample.getJSONObject(i)
             val gson = GsonBuilder().create()
             val model : ArrayList<CoordinateModel> = arrayListOf()
             gson.fromJson(jsonObject.getString("lsVectorsInStroke"),Array<CoordinateModel>::class.java).forEach {
                 model.add(CoordinateModel(it.x , it.y, it.z))
             }
 
-            listPath.add(PathModel(model))
+            listPathSample.add(PathModel(model))
         }
+
+        val jsonArrayDraw = JSONArray(loadJSONFromAsset("A_Be_ve.json"))
+        val listPathDraw : ArrayList<PathModel> = arrayListOf()
+        for (i in 0 until jsonArrayDraw.length()) {
+            val jsonObject = jsonArrayDraw.getJSONObject(i)
+            val gson = GsonBuilder().create()
+            val model : ArrayList<CoordinateModel> = arrayListOf()
+            gson.fromJson(jsonObject.getString("lsVectorsInStroke"),Array<CoordinateModel>::class.java).forEach {
+                model.add(CoordinateModel(it.x , it.y, it.z))
+            }
+
+            listPathDraw.add(PathModel(model))
+        }
+
+        val paintView = findViewById<PaintView>(R.id.paintView)
+        paintView.initBrush()
+        paintView.drawSample(listPathSample)
 
         val button = findViewById<Button>(R.id.button)
         button.setOnClickListener {
-            val paintView = findViewById<PaintView>(R.id.paintView)
-            paintView.startDrawing(listPath)
+            val paintView1 = findViewById<PaintView>(R.id.paintView1)
+            paintView1.initBrush()
+            paintView1.drawAnimation(listPathDraw)
         }
     }
 
-    private fun loadJSONFromAsset(): String {
+    private fun loadJSONFromAsset(assetName: String): String {
         var json: String = ""
         json = try {
-            val `is`: InputStream = this.assets.open("A_Ve_Mau.json")
+            val `is`: InputStream = this.assets.open(assetName)
             val size: Int = `is`.available()
             val buffer = ByteArray(size)
             `is`.read(buffer)
