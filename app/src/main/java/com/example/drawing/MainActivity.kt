@@ -13,9 +13,8 @@ import java.nio.charset.Charset
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 import android.util.DisplayMetrics
-
-
-
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class MainActivity : AppCompatActivity() {
@@ -79,8 +78,6 @@ class MainActivity : AppCompatActivity() {
         paintView2.setScreenMeasure(width, height)
         paintView2.drawSample(listPathSample)
     }
-
-
 
     private fun loadJSONFromAsset(assetName: String): String {
         var json: String = ""
