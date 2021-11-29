@@ -22,31 +22,31 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val jsonArraySample = JSONArray(loadJSONFromAsset("A_Ve_Mau.json"))
-        val listPathSample : ArrayList<PathModel> = arrayListOf()
-        for (i in 0 until jsonArraySample.length()) {
-            val jsonObject = jsonArraySample.getJSONObject(i)
-            val gson = GsonBuilder().create()
-            val model : ArrayList<CoordinateModel> = arrayListOf()
-            gson.fromJson(jsonObject.getString("lsVectorsInStroke"),Array<CoordinateModel>::class.java).forEach {
-                model.add(CoordinateModel(it.x , it.y, it.z))
-            }
+//        val jsonArraySample = JSONArray(loadJSONFromAsset("A_Ve_Mau.json"))
+//        val listPathSample : ArrayList<PathModel> = arrayListOf()
+//        for (i in 0 until jsonArraySample.length()) {
+//            val jsonObject = jsonArraySample.getJSONObject(i)
+//            val gson = GsonBuilder().create()
+//            val model : ArrayList<CoordinateModel> = arrayListOf()
+//            gson.fromJson(jsonObject.getString("lsVectorsInStroke"),Array<CoordinateModel>::class.java).forEach {
+//                model.add(CoordinateModel(it.x , it.y, it.z))
+//            }
+//
+//            listPathSample.add(PathModel(model))
+//        }
 
-            listPathSample.add(PathModel(model))
-        }
-
-        val jsonArrayDraw = JSONArray(loadJSONFromAsset("A_Be_ve.json"))
-        val listPathDraw : ArrayList<PathModel> = arrayListOf()
-        for (i in 0 until jsonArrayDraw.length()) {
-            val jsonObject = jsonArrayDraw.getJSONObject(i)
-            val gson = GsonBuilder().create()
-            val model : ArrayList<CoordinateModel> = arrayListOf()
-            gson.fromJson(jsonObject.getString("lsVectorsInStroke"),Array<CoordinateModel>::class.java).forEach {
-                model.add(CoordinateModel(it.x , it.y, it.z))
-            }
-
-            listPathDraw.add(PathModel(model))
-        }
+//        val jsonArrayDraw = JSONArray(loadJSONFromAsset("A_Be_ve.json"))
+//        val listPathDraw : ArrayList<PathModel> = arrayListOf()
+//        for (i in 0 until jsonArrayDraw.length()) {
+//            val jsonObject = jsonArrayDraw.getJSONObject(i)
+//            val gson = GsonBuilder().create()
+//            val model : ArrayList<CoordinateModel> = arrayListOf()
+//            gson.fromJson(jsonObject.getString("lsVectorsInStroke"),Array<CoordinateModel>::class.java).forEach {
+//                model.add(CoordinateModel(it.x , it.y, it.z))
+//            }
+//
+//            listPathDraw.add(PathModel(model))
+//        }
 
         val paintView = findViewById<PaintView>(R.id.paintView)
         paintView.initBrush()
@@ -59,9 +59,9 @@ class MainActivity : AppCompatActivity() {
         
         val button = findViewById<Button>(R.id.button)
         button.setOnClickListener {
-            paintView.drawAnimation(listPathDraw)
-            paintView1.drawAnimation(listPathDraw)
-            paintView2.drawAnimation(listPathDraw)
+            paintView.drawAnimation(JSONArray(loadJSONFromAsset("A_Be_ve.json")))
+            paintView1.drawAnimation(JSONArray(loadJSONFromAsset("A_Be_ve.json")))
+            paintView2.drawAnimation(JSONArray(loadJSONFromAsset("A_Be_ve.json")))
         }
 
         val displayMetrics = DisplayMetrics()
@@ -70,13 +70,13 @@ class MainActivity : AppCompatActivity() {
         val width = displayMetrics.widthPixels
 
         paintView.setScreenMeasure(width, height)
-        paintView.drawSample(listPathSample)
+        paintView.drawSample(JSONArray(loadJSONFromAsset("A_Ve_Mau.json")))
 
         paintView1.setScreenMeasure(width, height)
-        paintView1.drawSample(listPathSample)
+        paintView1.drawSample(JSONArray(loadJSONFromAsset("A_Ve_Mau.json")))
 
         paintView2.setScreenMeasure(width, height)
-        paintView2.drawSample(listPathSample)
+        paintView2.drawSample(JSONArray(loadJSONFromAsset("A_Ve_Mau.json")))
     }
 
     private fun loadJSONFromAsset(assetName: String): String {

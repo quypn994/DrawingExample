@@ -8,6 +8,8 @@ import android.graphics.*
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import com.google.gson.GsonBuilder
+import org.json.JSONArray
 import java.util.ArrayList
 
 class PaintView : View {
@@ -45,14 +47,27 @@ class PaintView : View {
     }
 
     var isDrawSample = false
-    fun drawSample(listPath: ArrayList<PathModel>) {
-        measurePathScale(listPath)
-        for (i in listPath.indices) {
-            pathSample.moveTo(listPath[i].path[0].x, listPath[i].path[0].y)
-            pathStroke.moveTo(listPath[i].path[0].x, listPath[i].path[0].y)
-            for (j in 1 until listPath[i].path.size) {
-                pathSample.lineTo(listPath[i].path[j].x, listPath[i].path[j].y)
-                pathStroke.lineTo(listPath[i].path[j].x, listPath[i].path[j].y)
+
+    fun drawSample(jsArray: JSONArray) {
+        val listPathDraw : ArrayList<PathModel> = arrayListOf()
+        for (i in 0 until jsArray.length()) {
+            val jsonObject = jsArray.getJSONObject(i)
+            val gson = GsonBuilder().create()
+            val model : ArrayList<CoordinateModel> = arrayListOf()
+            gson.fromJson(jsonObject.getString("lsVectorsInStroke"),Array<CoordinateModel>::class.java).forEach {
+                model.add(CoordinateModel(it.x , it.y, it.z))
+            }
+
+            listPathDraw.add(PathModel(model))
+        }
+
+        measurePathScale(listPathDraw)
+        for (i in listPathDraw.indices) {
+            pathSample.moveTo(listPathDraw[i].path[0].x, listPathDraw[i].path[0].y)
+            pathStroke.moveTo(listPathDraw[i].path[0].x, listPathDraw[i].path[0].y)
+            for (j in 1 until listPathDraw[i].path.size) {
+                pathSample.lineTo(listPathDraw[i].path[j].x, listPathDraw[i].path[j].y)
+                pathStroke.lineTo(listPathDraw[i].path[j].x, listPathDraw[i].path[j].y)
             }
         }
         isDrawSample = true
@@ -63,15 +78,27 @@ class PaintView : View {
     var isAnimationFinish = 0
     var currentPath = 0
     var length = 0f
-    fun drawAnimation(listPath: ArrayList<PathModel>) {
-        if (currentPath >= listPath.size) return
+    fun drawAnimation(jsArray: JSONArray) {
+        val listPathDraw : ArrayList<PathModel> = arrayListOf()
+        for (i in 0 until jsArray.length()) {
+            val jsonObject = jsArray.getJSONObject(i)
+            val gson = GsonBuilder().create()
+            val model : ArrayList<CoordinateModel> = arrayListOf()
+            gson.fromJson(jsonObject.getString("lsVectorsInStroke"),Array<CoordinateModel>::class.java).forEach {
+                model.add(CoordinateModel(it.x , it.y, it.z))
+            }
 
-        for (i in listPath.indices) {
+            listPathDraw.add(PathModel(model))
+        }
+
+        if (currentPath >= listPathDraw.size) return
+
+        for (i in listPathDraw.indices) {
             val subPath = Path()
             subPath.fillType = Path.FillType.EVEN_ODD
-            subPath.moveTo(listPath[i].path[0].x, listPath[i].path[0].y)
-            for (j in 1 until listPath[i].path.size) {
-                subPath.lineTo(listPath[i].path[j].x, listPath[i].path[j].y)
+            subPath.moveTo(listPathDraw[i].path[0].x, listPathDraw[i].path[0].y)
+            for (j in 1 until listPathDraw[i].path.size) {
+                subPath.lineTo(listPathDraw[i].path[j].x, listPathDraw[i].path[j].y)
             }
             pathDraw.add(subPath)
             val brush = Paint()
@@ -105,7 +132,7 @@ class PaintView : View {
                     length = measure.length
                     Log.d("qqDebug", "pathLength: $length")
                     isAnimationFinish = currentPath
-                    drawAnimation(listPath)
+                    drawAnimation(jsArray)
                 }
             }
 
@@ -148,7 +175,6 @@ class PaintView : View {
         maxY = yList.maxOf { float -> float }
         pathWidth = xList.maxOf { float -> float } - xList.minOf { float -> float }
         pathHeight = yList.maxOf { float -> float } - yList.minOf { float -> float }
-
 
         Log.d("qqDebug", "pathW: $pathWidth\npathH: $pathHeight")
     }
